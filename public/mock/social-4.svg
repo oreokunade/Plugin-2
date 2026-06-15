@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#1A0A1E"/>
+
+  <!-- Carousel / story mockup — multiple panels -->
+  <!-- Panel 1 (main) -->
+  <rect x="40" y="60" width="320" height="420" rx="10" fill="#2D0A2E"/>
+  <rect x="40" y="60" width="320" height="200" rx="10" fill="#C44569" opacity="0.35"/>
+
+  <!-- Product grid inside -->
+  <rect x="60" y="80" width="90" height="90" rx="6" fill="#FF6B9D" opacity="0.4"/>
+  <rect x="160" y="80" width="90" height="90" rx="6" fill="#C44569" opacity="0.5"/>
+  <rect x="260" y="80" width="80" height="90" rx="6" fill="#FF6B9D" opacity="0.3"/>
+
+  <text x="200" y="295" font-family="Georgia, serif" font-size="20" fill="white" text-anchor="middle" letter-spacing="4">NEW IN</text>
+  <text x="200" y="318" font-family="system-ui, sans-serif" font-size="10" fill="#FF6B9D" text-anchor="middle" letter-spacing="3">AUTUMN · WINTER</text>
+
+  <!-- Price tags -->
+  <rect x="60" y="340" width="85" height="24" rx="12" fill="#FF6B9D"/>
+  <text x="102" y="357" font-family="system-ui, sans-serif" font-size="10" fill="white" text-anchor="middle" font-weight="600">₦12,500</text>
+  <rect x="155" y="340" width="85" height="24" rx="12" fill="#FF6B9D"/>
+  <text x="197" y="357" font-family="system-ui, sans-serif" font-size="10" fill="white" text-anchor="middle" font-weight="600">₦18,000</text>
+
+  <text x="200" y="440" font-family="system-ui, sans-serif" font-size="9" fill="#ffffff40" text-anchor="middle" letter-spacing="2">Swipe to see more →</text>
+
+  <!-- Panel 2 peeking -->
+  <rect x="375" y="90" width="200" height="370" rx="10" fill="#3D1540" opacity="0.7"/>
+  <rect x="390" y="110" width="170" height="100" rx="6" fill="#C44569" opacity="0.3"/>
+  <text x="475" y="240" font-family="Georgia, serif" font-size="14" fill="white" text-anchor="middle" letter-spacing="2" opacity="0.6">ÉLITE</text>
+
+  <!-- Dots indicator -->
+  <circle cx="270" cy="510" r="4" fill="#FF6B9D"/>
+  <circle cx="286" cy="510" r="3" fill="#ffffff30"/>
+  <circle cx="300" cy="510" r="3" fill="#ffffff30"/>
+  <circle cx="314" cy="510" r="3" fill="#ffffff30"/>
+
+  <!-- Handle -->
+  <text x="200" y="555" font-family="system-ui, sans-serif" font-size="11" fill="#ffffff40" text-anchor="middle">@elitefashionlagos · Instagram Carousel</text>
+</svg>

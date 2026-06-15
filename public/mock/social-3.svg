@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="s3bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B9D"/>
+      <stop offset="100%" style="stop-color:#C44569"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#s3bg)"/>
+
+  <!-- Sale announcement -->
+  <text x="300" y="140" font-family="Georgia, serif" font-size="16" fill="white" text-anchor="middle" letter-spacing="6" opacity="0.8">LIMITED TIME</text>
+
+  <!-- Big number -->
+  <text x="300" y="300" font-family="Georgia, serif" font-size="160" font-weight="900" fill="white" text-anchor="middle" opacity="0.15">30</text>
+  <text x="300" y="295" font-family="Georgia, serif" font-size="120" font-weight="900" fill="white" text-anchor="middle">30%</text>
+
+  <text x="300" y="345" font-family="system-ui, sans-serif" font-size="18" fill="white" text-anchor="middle" letter-spacing="4">OFF EVERYTHING</text>
+
+  <!-- Divider -->
+  <rect x="200" y="372" width="200" height="1" fill="white" opacity="0.4"/>
+
+  <text x="300" y="400" font-family="system-ui, sans-serif" font-size="12" fill="white" text-anchor="middle" letter-spacing="2" opacity="0.85">USE CODE: ELITE30</text>
+
+  <!-- CTA button -->
+  <rect x="195" y="430" width="210" height="48" rx="24" fill="white"/>
+  <text x="300" y="460" font-family="system-ui, sans-serif" font-size="13" fill="#C44569" text-anchor="middle" font-weight="700" letter-spacing="1">SHOP NOW</text>
+
+  <!-- Wordmark -->
+  <text x="300" y="540" font-family="Georgia, serif" font-size="18" fill="white" text-anchor="middle" letter-spacing="8" opacity="0.7">ÉLITE</text>
+</svg>

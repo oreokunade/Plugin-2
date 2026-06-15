@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// ─── Plugin PIL — Firebase Storage Security Rules ────────────────────────────
+//
+// Providers upload images + videos via /api/upload (server-side route).
+// The server route uses the admin SDK which bypasses these rules.
+// These rules are therefore a safety net — they deny all direct client-side
+// Storage access so no provider can write to another provider's folder or
+// read another provider's un-published files directly.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Provider portfolio uploads ────────────────────────────────────────────
+    // Path: portfolio/{uid}/{filename}
+    // - Read: only the owning provider (their own uploads before approved)
+    // - Write: denied — all writes go through /api/upload (admin SDK)
+
+    match /portfolio/{uid}/{allPaths=**} {
+      allow read:  if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ── Everything else — deny ────────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

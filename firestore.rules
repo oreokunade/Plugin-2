@@ -1,0 +1,101 @@
+rules_version = '2';
+
+// ─── Plugin PIL — Firestore Security Rules ────────────────────────────────────
+//
+// Architecture:
+//   Layer 1 (public)  — /p/[uid] client portfolio page — read via server component
+//                        using admin SDK (bypasses these rules)
+//   Layer 2 (internal) — admin panel + bot API — all admin SDK (bypasses these rules)
+//   Layer 3 (provider) — onboarding + upload — Firebase client SDK (these rules apply)
+//
+// Client SDK is used by providers only (auth required for all writes).
+// Admin SDK (server-side) bypasses these rules entirely.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Only the fields a provider is allowed to write on their own profile
+    function validProviderFields() {
+      let allowed = [
+        'first_name', 'last_name', 'name', 'phone',
+        'category', 'subcategories', 'bio', 'skills',
+        'availability', 'onboarding_complete', 'bot_onboarded',
+        'updated_at'
+      ];
+      return request.resource.data.keys().hasOnly(allowed);
+    }
+
+    // Only the fields a provider can set on a new portfolio item
+    function validPortfolioItemFields() {
+      let allowed = [
+        'provider_id', 'title', 'cover_image', 'template_type',
+        'blocks', 'category', 'tags', 'status', 'quality_tier',
+        'ocr_flagged', 'admin_notes', 'created_at', 'updated_at'
+      ];
+      return request.resource.data.keys().hasOnly(allowed);
+    }
+
+    // ── Providers collection ─────────────────────────────────────────────────
+    // Providers can read + write their own document only.
+    // Admin SDK reads all (for admin panel + bot API) — bypasses rules.
+
+    match /providers/{uid} {
+      // Provider can read their own profile
+      allow read: if isOwner(uid);
+
+      // Provider can create their profile on first sign-in
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == request.auth.uid
+        && validProviderFields();
+
+      // Provider can update their own profile (except uid, created_at, quality_tier)
+      allow update: if isOwner(uid)
+        && validProviderFields()
+        && !('uid'          in request.resource.data.diff(resource.data).affectedKeys())
+        && !('quality_tier' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('created_at'   in request.resource.data.diff(resource.data).affectedKeys());
+
+      // Only admin SDK can delete
+      allow delete: if false;
+    }
+
+    // ── Portfolio items collection ────────────────────────────────────────────
+    // Providers can create items for themselves and read their own items.
+    // Providers cannot update or delete — only admin can approve/reject/delete.
+
+    match /portfolio_items/{itemId} {
+      // Provider can read their own items
+      allow read: if isSignedIn()
+        && resource.data.provider_id == request.auth.uid;
+
+      // Provider can submit a new item — status must be "pending"
+      allow create: if isSignedIn()
+        && request.resource.data.provider_id == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.quality_tier == 'Bronze'
+        && validPortfolioItemFields();
+
+      // Providers cannot update or delete — admin SDK only
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ── All other collections — admin SDK only ────────────────────────────────
+    // outcome_cards, style_cards, engagement_logs etc. are internal only.
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
