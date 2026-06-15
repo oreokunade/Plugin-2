@@ -3,12 +3,19 @@ import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { getAuth } from "firebase-admin/auth";
 
-const DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+const HAS_ADMIN_CREDENTIALS = Boolean(
+  process.env.FIREBASE_ADMIN_PROJECT_ID &&
+  process.env.FIREBASE_ADMIN_CLIENT_EMAIL &&
+  process.env.FIREBASE_ADMIN_PRIVATE_KEY
+);
+
+const DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === "true" || !HAS_ADMIN_CREDENTIALS;
 
 function initAdmin(): App {
   if (getApps().length > 0) return getApps()[0];
 
-  // In dev mode use a minimal placeholder app — no real Firebase calls will be made
+  // In dev mode (or when admin credentials aren't configured yet) use a
+  // minimal placeholder app — no real Firebase calls will be made
   if (DEV_MODE) {
     return initializeApp({ projectId: "dev-placeholder" });
   }
