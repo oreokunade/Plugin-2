@@ -173,5 +173,5 @@ function Field({ label, hint, required, children }: {
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan/40 focus:border-cyan transition-colors";
-const selectCls = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan/40 focus:border-cyan bg-white transition-colors";
+const inputCls = "w-full bg-[#F1F3F7] border border-transparent rounded-xl px-4 py-3 text-[13.5px] text-gray-800 focus:outline-none focus:bg-white focus:border-[#00EFFE] focus:ring-2 focus:ring-[#00EFFE]/20 transition-all";
+const selectCls = "w-full bg-[#F1F3F7] border border-transparent rounded-xl px-4 py-3 text-[13.5px] text-gray-800 focus:outline-none focus:bg-white focus:border-[#00EFFE] focus:ring-2 focus:ring-[#00EFFE]/20 transition-all bg-white";

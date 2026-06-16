@@ -197,4 +197,4 @@ function Spinner() {
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-[13.5px] text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 focus:border-[#00EFFE] transition-colors";
+const inputCls = "w-full bg-[#F1F3F7] border border-transparent rounded-xl px-3.5 py-2.5 text-[13.5px] text-gray-800 focus:outline-none focus:bg-white focus:border-[#00EFFE] focus:ring-2 focus:ring-[#00EFFE]/20 transition-all";

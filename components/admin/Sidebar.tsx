@@ -42,7 +42,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-white border-r border-gray-100 flex flex-col flex-shrink-0 shadow-[1px_0_0_0_#f1f3f5]">
+    <aside className="w-64 min-h-screen bg-white flex flex-col flex-shrink-0 shadow-[2px_0_12px_rgba(0,0,0,0.06)]">
 
       {/* Logo */}
       <div className="px-6 h-[72px] flex items-center gap-3 border-b border-gray-100">
@@ -64,22 +64,17 @@ export function AdminSidebar() {
               : pathname.startsWith(item.href);
           return (
             <Link key={item.href} href={item.href}
-              className={`flex items-center gap-3 px-3.5 py-3 rounded-xl text-[13.5px] font-medium transition-all group
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition-all group
                 ${isActive
-                  ? "bg-[#0C5BEE]/8 text-[#0C5BEE]"
-                  : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+                  ? "bg-[#0C5BEE] text-white shadow-[0_4px_12px_rgba(12,91,238,0.30)]"
+                  : "text-gray-500 font-medium hover:text-gray-800 hover:bg-gray-50"
                 }`}>
-              <span className={`flex-shrink-0 transition-colors ${isActive ? "text-[#0C5BEE]" : "text-gray-400 group-hover:text-gray-600"}`}>
+              <span className={`flex-shrink-0 transition-colors ${isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"}`}>
                 {item.icon}
               </span>
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1 tracking-tight">{item.label}</span>
               {item.badge && !isActive && (
                 <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
-              )}
-              {isActive && (
-                <svg className="w-3.5 h-3.5 text-[#0C5BEE]/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
               )}
             </Link>
           );

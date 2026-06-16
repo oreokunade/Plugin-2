@@ -43,7 +43,7 @@ export default async function OutcomesPage() {
 
 function OutcomeCardItem({ card }: { card: OutcomeCard }) {
   return (
-    <div className="bg-white rounded-[16px] border border-gray-200 p-5 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-5 hover:shadow-[var(--card-shadow-lg)] transition-shadow">
       <div className="flex items-start justify-between gap-3 mb-3">
         <span className="text-xs font-semibold bg-cyan/15 text-dark-teal px-2.5 py-1 rounded-full">
           {card.category}

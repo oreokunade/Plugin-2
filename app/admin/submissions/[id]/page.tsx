@@ -179,7 +179,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 
           {/* Right — details + review form */}
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+            <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-6 space-y-4">
               <h3 className="font-display font-semibold text-gray-800 text-[15px]">Submission Details</h3>
               <Info label="Title"    value={item.title} />
               <Info label="Category" value={item.category} />

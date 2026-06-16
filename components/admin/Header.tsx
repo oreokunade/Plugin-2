@@ -15,7 +15,7 @@ export function AdminHeader({ title, subtitle, action }: AdminHeaderProps) {
   return (
     <header className="h-[72px] bg-white border-b border-gray-100 flex items-center px-8 gap-4 flex-shrink-0">
       <div className="flex-1 min-w-0">
-        <h1 className="font-display font-bold text-gray-900 text-[18px] leading-none truncate">
+        <h1 className="font-display font-extrabold text-gray-900 text-[18px] leading-none truncate tracking-tight">
           {title}
         </h1>
         {subtitle && (

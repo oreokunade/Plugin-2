@@ -74,14 +74,14 @@ export default function ReviewActions({
   }
 
   return (
-    <div className="bg-white rounded-[16px] border border-gray-200 p-5 space-y-4">
+    <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-6 space-y-4">
       <h3 className="font-semibold text-gray-800 text-sm">Review & Tag</h3>
 
       {/* Category override */}
       <div>
         <label className="block text-xs text-gray-500 mb-1">Category</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 bg-white">
+          className={inputCls}>
           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
@@ -113,7 +113,7 @@ export default function ReviewActions({
         <input type="text" placeholder="e.g. rebrand, fintech, logo"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40" />
+          className={inputCls} />
       </div>
 
       {/* Admin notes */}
@@ -124,7 +124,7 @@ export default function ReviewActions({
         <textarea rows={3} placeholder="e.g. Please upload higher resolution images…"
           value={adminNotes}
           onChange={(e) => setAdminNotes(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 resize-none" />
+          className={`${inputCls} resize-none`} />
       </div>
 
       {/* Error */}
@@ -154,6 +154,8 @@ export default function ReviewActions({
     </div>
   );
 }
+
+const inputCls = "w-full bg-[#F1F3F7] border border-transparent rounded-xl px-3.5 py-2.5 text-[13.5px] text-gray-800 focus:outline-none focus:bg-white focus:border-[#00EFFE] focus:ring-2 focus:ring-[#00EFFE]/20 transition-all";
 
 function Spinner() {
   return (

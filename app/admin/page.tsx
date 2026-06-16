@@ -31,10 +31,10 @@ export default async function AdminDashboard() {
 
           {/* Primary action */}
           <Link href="/admin/submissions"
-            className={`block rounded-2xl border p-7 transition-all hover:shadow-lg group ${
+            className={`block rounded-2xl p-7 transition-all hover:shadow-[var(--card-shadow-lg)] group shadow-[var(--card-shadow)] ${
               stats.pending > 0
-                ? "bg-amber-50 border-amber-200 hover:border-amber-300"
-                : "bg-white border-gray-200"
+                ? "bg-amber-50"
+                : "bg-white"
             }`}>
             <div className="flex items-start justify-between mb-4">
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
@@ -64,11 +64,11 @@ export default async function AdminDashboard() {
 
           {/* Secondary stats */}
           <div className="grid grid-cols-2 gap-5">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.06)] p-6">
+            <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-6">
               <p className="font-display font-bold text-3xl text-gray-900 mb-1">{stats.approved}</p>
               <p className="text-[13px] text-gray-500">portfolio items live</p>
             </div>
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.06)] p-6">
+            <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-6">
               <p className="font-display font-bold text-3xl text-gray-900 mb-1">{stats.providers}</p>
               <p className="text-[13px] text-gray-500">providers onboarded</p>
             </div>

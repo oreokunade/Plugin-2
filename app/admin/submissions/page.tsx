@@ -117,7 +117,7 @@ function SubmissionCard({ item, provider }: { item: PortfolioItem; provider?: Pr
   const templateLabel = item.template_type?.replace(/_/g, " ") ?? "—";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.10)] transition-all duration-200 group">
+    <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] overflow-hidden hover:shadow-[var(--card-shadow-lg)] transition-all duration-200 group">
       {/* Cover */}
       <div className="h-44 bg-gray-100 overflow-hidden relative">
         {item.cover_image ? (

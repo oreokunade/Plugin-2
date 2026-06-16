@@ -55,8 +55,11 @@
 /* ─── Base ───────────────────────────────────────────────────────────────── */
 
 :root {
-  --background: #0A0A0A;
-  --foreground: #FFFFFF;
+  --background:      #0A0A0A;
+  --foreground:      #FFFFFF;
+  --page-bg:         #F4F5F9;   /* blue-tinted off-white — makes white cards pop */
+  --card-shadow:     0 2px 8px rgba(0,0,0,0.07), 0 0px 1px rgba(0,0,0,0.04);
+  --card-shadow-lg:  0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
 }
 
 *, *::before, *::after {
@@ -84,32 +87,31 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ─── Utility classes ────────────────────────────────────────────────────── */
 
-/* Light-mode card */
+/* Light-mode card — shadow only, no border */
 .card {
   background: #ffffff;
-  border: 1px solid #e8eaed;
   border-radius: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.03);
+  box-shadow: var(--card-shadow);
 }
 
 .card-raised {
   background: #ffffff;
-  border: 1px solid #e8eaed;
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: var(--card-shadow-lg);
 }
 
-/* Light-mode input */
+/* Light-mode input — gray fill, no border */
 .input-light {
-  background: #ffffff;
-  border: 1.5px solid #e8eaed;
+  background: #F1F3F7;
+  border: 1.5px solid transparent;
   border-radius: 10px;
   color: #111827;
-  transition: border-color 150ms, box-shadow 150ms;
+  transition: background 150ms, border-color 150ms, box-shadow 150ms;
 }
 
 .input-light:focus {
   outline: none;
+  background: #ffffff;
   border-color: #00EFFE;
   box-shadow: 0 0 0 3px rgba(0, 239, 254, 0.15);
 }
@@ -136,12 +138,13 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary {
   background: #00EFFE;
   color: #0A0A0A;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   border-radius: 10px;
   transition: background 150ms, box-shadow 150ms, transform 80ms;
 }
 
-.btn-primary:hover  { background: #00D4E0; box-shadow: 0 0 20px rgba(0,239,254,0.25); }
+.btn-primary:hover  { background: #00D4E0; box-shadow: 0 4px 16px rgba(0,239,254,0.30); }
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 

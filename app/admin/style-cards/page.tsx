@@ -50,7 +50,7 @@ export default async function StyleCardsPage() {
 function StyleCardItem({ card }: { card: StyleCard }) {
   const colorCls = STYLE_COLORS[card.style_label] ?? "bg-blue/10 text-blue";
   return (
-    <div className="bg-white rounded-[16px] border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] overflow-hidden hover:shadow-[var(--card-shadow-lg)] transition-shadow">
       <div className={`px-5 py-3 ${colorCls}`}>
         <p className="text-sm font-semibold">{card.style_label}</p>
       </div>

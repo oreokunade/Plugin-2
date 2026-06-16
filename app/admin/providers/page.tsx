@@ -51,7 +51,7 @@ export default async function ProvidersPage() {
         {providers.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
