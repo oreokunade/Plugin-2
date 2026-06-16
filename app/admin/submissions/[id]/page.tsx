@@ -107,8 +107,8 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
   return (
     <>
       <AdminHeader title="Review Submission" subtitle={item.title} />
-      <main className="flex-1 p-6 overflow-auto">
-        <div className="max-w-3xl grid md:grid-cols-2 gap-6">
+      <main className="flex-1 p-8 overflow-auto">
+        <div className="max-w-5xl grid md:grid-cols-2 gap-8">
 
           {/* Left — media + provider info */}
           <div className="space-y-4">
@@ -179,8 +179,8 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 
           {/* Right — details + review form */}
           <div className="space-y-4">
-            <div className="bg-white rounded-[16px] border border-gray-200 p-5 space-y-3">
-              <h3 className="font-display font-semibold text-gray-800 text-sm">Submission Details</h3>
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+              <h3 className="font-display font-semibold text-gray-800 text-[15px]">Submission Details</h3>
               <Info label="Title"    value={item.title} />
               <Info label="Category" value={item.category} />
               <Info label="Template" value={item.template_type?.replace(/_/g, " ")} />
@@ -212,16 +212,16 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 function Info({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[11px] text-gray-400 mb-0.5">{label}</p>
-      <div className="text-sm text-gray-800">{value}</div>
+      <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
+      <div className="text-[14px] text-gray-800">{value}</div>
     </div>
   );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <p className="text-sm">
-      <span className="text-amber-600">{label}:</span>{" "}
+    <p className="text-[13.5px]">
+      <span className="text-amber-600 font-medium">{label}:</span>{" "}
       <span className="text-gray-800">{value}</span>
     </p>
   );
