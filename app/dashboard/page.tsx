@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useTransition, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { auth, db, DEV_MODE } from "@/lib/firebase";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { setAvailability } from "./actions";
 import type { Provider, PortfolioItem, SubmissionStatus } from "@/lib/types";
 
 // ─── Dev mock data ────────────────────────────────────────────────────────────
@@ -58,17 +59,19 @@ function DashboardInner() {
   const searchParams = useSearchParams();
   const justUploaded = searchParams.get("uploaded") === "true";
 
-  const [provider, setProvider] = useState<Provider | null>(null);
-  const [items,    setItems]    = useState<PortfolioItem[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [toast,    setToast]    = useState(justUploaded);
+  const [provider,      setProvider]      = useState<Provider | null>(null);
+  const [items,         setItems]         = useState<PortfolioItem[]>([]);
+  const [loading,       setLoading]       = useState(true);
+  const [toast,         setToast]         = useState(justUploaded);
+  const [availability,  setAvailState]    = useState<"available" | "busy" | "unavailable">("available");
+  const [availPending,  startAvailTx]     = useTransition();
 
   useEffect(() => {
     if (toast) { const t = setTimeout(() => setToast(false), 3500); return () => clearTimeout(t); }
   }, [toast]);
 
   useEffect(() => {
-    if (DEV_MODE) { setProvider(DEV_PROVIDER); setItems(DEV_ITEMS); setLoading(false); return; }
+    if (DEV_MODE) { setProvider(DEV_PROVIDER); setItems(DEV_ITEMS); setAvailState(DEV_PROVIDER.availability); setLoading(false); return; }
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) { router.replace("/onboard"); return; }
       const [provSnap, itemsSnap] = await Promise.all([
@@ -76,7 +79,9 @@ function DashboardInner() {
         getDocs(query(collection(db, "portfolio_items"), where("provider_id", "==", user.uid))),
       ]);
       if (!provSnap.exists()) { router.replace("/onboard"); return; }
-      setProvider({ id: provSnap.id, ...provSnap.data() } as Provider);
+      const p = { id: provSnap.id, ...provSnap.data() } as Provider;
+      setProvider(p);
+      setAvailState(p.availability ?? "available");
       setItems(itemsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as PortfolioItem[]);
       setLoading(false);
     });
@@ -165,12 +170,28 @@ function DashboardInner() {
                   <span className="text-gray-500">Quality tier</span>
                   <TierPill tier={provider?.quality_tier ?? "Bronze"} />
                 </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Availability</span>
-                  <span className="flex items-center gap-1 font-medium text-emerald-600">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-                    {provider?.availability ?? "available"}
-                  </span>
+                <div className="pt-1">
+                  <p className="text-xs text-gray-500 mb-2">Availability</p>
+                  <div className="flex gap-1.5">
+                    {(["available", "busy", "unavailable"] as const).map((s) => (
+                      <button key={s} disabled={availPending}
+                        onClick={() => {
+                          setAvailState(s);
+                          startAvailTx(async () => {
+                            await setAvailability(provider?.uid ?? provider?.id ?? "", s);
+                          });
+                        }}
+                        className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all border ${
+                          availability === s
+                            ? s === "available"   ? "bg-emerald-500 border-emerald-500 text-white"
+                              : s === "busy"      ? "bg-amber-400 border-amber-400 text-white"
+                              : "bg-red-500 border-red-500 text-white"
+                            : "bg-white border-gray-200 text-gray-400 hover:border-gray-300"
+                        } disabled:opacity-60`}>
+                        {s === "unavailable" ? "away" : s}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

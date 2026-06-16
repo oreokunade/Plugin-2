@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { AdminHeader } from "@/components/admin/Header";
-import { adminDb } from "@/lib/firebase-admin";
+import { adminDb, ADMIN_DEV_MODE } from "@/lib/firebase-admin";
 import { TierBadge } from "@/components/ui/Badge";
 import type { Provider } from "@/lib/types";
 
+const DEV_PROVIDERS: Provider[] = [
+  { id: "dev-uid-001", uid: "dev-uid-001", first_name: "Dara",  last_name: "Okunade", name: "Dara Okunade",  phone: "+2348012345678", category: "Branding, Design & Identity",    subcategories: ["Logo Design", "Brand Identity Systems"], bio: "5 years building brands for Nigerian startups.", skills: ["Logo Design", "Brand Identity Systems"], quality_tier: "Gold",   availability: "available",   onboarding_complete: true, created_at: "", updated_at: "" },
+  { id: "dev-uid-002", uid: "dev-uid-002", first_name: "Emeka", last_name: "Okafor",  name: "Emeka Okafor",  phone: "+2348023456789", category: "Digital Marketing & E-Commerce", subcategories: ["Social Media Management"],                bio: "Social media strategist with 3 years experience.", skills: ["Social Media Management", "SEO"],           quality_tier: "Silver", availability: "busy",        onboarding_complete: true, created_at: "", updated_at: "" },
+  { id: "dev-uid-003", uid: "dev-uid-003", first_name: "Bola",  last_name: "Adeyemi", name: "Bola Adeyemi",  phone: "+2348034567890", category: "Video, Film & Entertainment",    subcategories: ["Video Editing (YouTube, TikTok)"],        bio: "Videographer and editor based in Lagos.",           skills: ["Video Editing (YouTube, TikTok)"],             quality_tier: "Bronze", availability: "unavailable", onboarding_complete: true, created_at: "", updated_at: "" },
+];
+
 async function getProviders(): Promise<Provider[]> {
+  if (ADMIN_DEV_MODE) return DEV_PROVIDERS;
   try {
     const snap = await adminDb
       .collection("providers")
