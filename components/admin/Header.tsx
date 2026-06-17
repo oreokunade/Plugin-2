@@ -13,24 +13,25 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ title, subtitle, action }: AdminHeaderProps) {
   return (
-    <header className="h-[72px] bg-white border-b border-gray-100 flex items-center px-8 gap-4 flex-shrink-0">
+    <header className="bg-white border-b border-gray-100 flex items-center px-4 sm:px-6 lg:px-8 gap-4 flex-shrink-0 h-14 lg:h-[72px]">
       <div className="flex-1 min-w-0">
-        <h1 className="font-display font-extrabold text-gray-900 text-[18px] leading-none truncate tracking-tight">
+        <h1 className="font-display font-extrabold text-gray-900 text-[16px] lg:text-[18px] leading-none truncate tracking-tight">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-gray-400 text-[13px] mt-1 truncate">{subtitle}</p>
+          <p className="text-gray-400 text-[12px] lg:text-[13px] mt-1 truncate">{subtitle}</p>
         )}
       </div>
       {action && (
         <Link
           href={action.href}
-          className="inline-flex items-center gap-2 bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] text-[13.5px] font-semibold px-5 py-2.5 rounded-xl transition-colors flex-shrink-0 shadow-sm"
+          className="inline-flex items-center gap-2 bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] text-[13px] lg:text-[13.5px] font-semibold px-3.5 sm:px-5 py-2.5 lg:py-3.5 rounded-xl transition-colors flex-shrink-0"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
           </svg>
-          {action.label}
+          <span className="hidden sm:inline">{action.label}</span>
+          <span className="sm:hidden">Add</span>
         </Link>
       )}
     </header>

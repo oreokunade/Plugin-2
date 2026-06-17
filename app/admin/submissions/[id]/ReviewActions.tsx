@@ -74,7 +74,7 @@ export default function ReviewActions({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-6 space-y-4">
+    <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
       <h3 className="font-semibold text-gray-800 text-sm">Review & Tag</h3>
 
       {/* Category override */}
@@ -137,11 +137,11 @@ export default function ReviewActions({
       {/* Action buttons */}
       <div className="flex gap-2 pt-1">
         <button onClick={() => handleReview("approved")} disabled={saving}
-          className="flex-1 bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] text-sm font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+          className="flex-1 bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] text-sm font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
           {saving ? <Spinner /> : "✓ Approve"}
         </button>
         <button onClick={() => handleReview("rejected")} disabled={saving}
-          className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-sm font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+          className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-sm font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
           {saving ? <Spinner /> : "✕ Reject"}
         </button>
       </div>

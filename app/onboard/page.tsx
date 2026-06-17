@@ -123,7 +123,7 @@ export default function OnboardPage() {
     setError(""); setLoading(true);
     try {
       setupRecaptcha();
-      const formatted = phone.startsWith("+") ? phone : `+234${phone.replace(/^0/, "")}`;
+      const formatted = phone.startsWith("+") ? phone : `+${phone}`;
       const result = await signInWithPhoneNumber(auth, formatted, window.recaptchaVerifier);
       setConfirmation(result);
       setStep("otp");
@@ -218,26 +218,26 @@ export default function OnboardPage() {
 
           {/* ── Phone ── */}
           {step === "phone" && (
-            <StepCard step={1} total={3} title="Enter your number" subtitle="We'll send a verification code to your WhatsApp number">
+            <StepCard step={1} total={3} title="Enter your WhatsApp number" subtitle="We'll send a one-time code to confirm it's you. No spam, ever.">
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div>
                   <Label>Phone number</Label>
-                  <div className="flex gap-2 mt-2">
-                    <div className="flex items-center px-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 text-sm font-mono flex-shrink-0">+234</div>
-                    <Input type="tel" required autoFocus placeholder="8012345678"
-                      value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} />
+                  <div className="mt-2">
+                    <Input type="tel" required autoFocus placeholder="+2348012345678"
+                      value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^\d+]/g, ""))} />
+                    <p className="text-xs text-gray-400 mt-1.5">Include your country code, e.g. +234 for Nigeria</p>
                   </div>
                 </div>
                 {error && <ErrorMsg msg={error} />}
                 <div id="recaptcha-container" ref={recaptchaRef} />
-                <PrimaryBtn loading={loading} label="Send code" />
+                <PrimaryBtn loading={loading} label="Send code →" />
               </form>
             </StepCard>
           )}
 
           {/* ── OTP ── */}
           {step === "otp" && (
-            <StepCard step={2} total={3} title="Enter the code" subtitle={`Sent to +234${phone.replace(/^0/, "")}`}>
+            <StepCard step={2} total={3} title="Enter the code we sent you" subtitle={`We texted a 6-digit code to ${phone}. It expires in 10 minutes.`}>
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
                   <Label>6-digit code</Label>
@@ -246,10 +246,10 @@ export default function OnboardPage() {
                     className="mt-2 w-full px-4 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 text-2xl tracking-[0.6em] text-center font-mono focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 focus:border-[#00EFFE] transition-all" />
                 </div>
                 {error && <ErrorMsg msg={error} />}
-                <PrimaryBtn loading={loading} label="Verify" />
+                <PrimaryBtn loading={loading} label="Verify →" />
                 <button type="button" onClick={() => { setStep("phone"); setOtp(""); setError(""); }}
                   className="w-full text-sm text-gray-400 hover:text-gray-600 transition-colors py-1">
-                  ← Change number
+                  ← Wrong number? Change it
                 </button>
               </form>
             </StepCard>
@@ -258,16 +258,16 @@ export default function OnboardPage() {
           {/* ── Profile ── */}
           {step === "profile" && (
             <div>
-              <StepDots current={3} total={3} />
-              <h1 className="font-display font-bold text-gray-900 text-2xl mb-1.5">Your profile</h1>
-              <p className="text-gray-500 text-sm mb-8 leading-relaxed">Tell clients what you do — this sits alongside your work</p>
+              <StepBar current={3} total={3} />
+              <h1 className="font-display font-bold text-gray-900 text-2xl mb-1.5">Set up your profile</h1>
+              <p className="text-gray-500 text-sm mb-8 leading-relaxed">Clients see this next to your work. Your name, category, and what you specialise in.</p>
 
               <form onSubmit={handleProfileSubmit} className="space-y-7">
 
                 {/* ── Name ── */}
                 <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] space-y-4">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Your name</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <Label required>First name</Label>
                       <Input required autoFocus placeholder="Amara" className="mt-2"
@@ -395,14 +395,16 @@ export default function OnboardPage() {
           {/* ── Ready ── */}
           {step === "ready" && (
             <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-50 border-2 border-emerald-200 rounded-full flex items-center justify-center mx-auto mb-5">
-                <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-[#00EFFE]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-[#0D5C6F]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="font-display font-bold text-gray-900 text-2xl mb-2">You&apos;re in</h2>
+              <h2 className="font-display font-bold text-gray-900 text-2xl mb-2">
+                You&apos;re all set{profile.firstName ? `, ${profile.firstName}` : ""}!
+              </h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
-                Now upload your work so clients can see what you&apos;re capable of.
+                Your profile is live. Now add some work — that&apos;s what gets clients excited.
               </p>
               <button onClick={() => router.push("/dashboard/upload")}
                 className="w-full py-3.5 bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] text-sm font-semibold rounded-xl transition-colors">
@@ -410,7 +412,7 @@ export default function OnboardPage() {
               </button>
               <button onClick={() => router.push("/dashboard")}
                 className="mt-3 w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors">
-                Go to dashboard
+                I&apos;ll do it later
               </button>
             </div>
           )}
@@ -423,16 +425,56 @@ export default function OnboardPage() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function StepDots({ current, total }: { current: number; total: number }) {
+const STEP_META = [
+  {
+    label: "Enter your number",
+  },
+  {
+    label: "Verify with code",
+  },
+  {
+    label: "Build your profile",
+  },
+];
+
+function StepBar({ current, total }: { current: number; total: number }) {
   return (
-    <div className="flex items-center gap-1.5 mb-6">
-      {Array.from({ length: total }).map((_, i) => (
-        <div key={i} className={`h-1 rounded-full transition-all duration-300 ${
-          i + 1 === current ? "w-6 bg-[#00EFFE]"
-          : i + 1 < current ? "w-3 bg-[#00EFFE]/40"
-          : "w-3 bg-gray-200"
-        }`} />
-      ))}
+    <div className="flex items-start mb-8">
+      {STEP_META.slice(0, total).map((s, i) => {
+        const num    = i + 1;
+        const done   = num < current;
+        const active = num === current;
+        return (
+          <div key={num} className="flex items-start flex-1">
+            <div className="flex flex-col items-center gap-2 min-w-0">
+              <div
+                style={done ? { backgroundColor: "#00EFFE", color: "#0D5C6F" } : undefined}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 text-sm font-bold ${
+                  done    ? ""
+                  : active ? "bg-[#00EFFE]/15 text-[#0C5BEE] ring-2 ring-[#00EFFE]/50"
+                  : "bg-gray-100 text-gray-400"
+                }`}
+              >
+                {done ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                    <path d="M5 13l4 4L19 7"/>
+                  </svg>
+                ) : num}
+              </div>
+              <span className={`text-[11px] font-semibold text-center leading-tight transition-colors max-w-[72px] ${
+                active ? "text-[#0C5BEE]" : done ? "text-[#00BFCC]" : "text-gray-400"
+              }`}>
+                {s.label}
+              </span>
+            </div>
+            {i < total - 1 && (
+              <div className={`flex-1 h-px mt-[18px] mx-2 transition-colors duration-300 ${
+                num < current ? "bg-[#00EFFE]" : "bg-gray-200"
+              }`} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -442,7 +484,7 @@ function StepCard({ step, total, title, subtitle, children }: {
 }) {
   return (
     <div>
-      <StepDots current={step} total={total} />
+      <StepBar current={step} total={total} />
       <h1 className="font-display font-bold text-gray-900 text-2xl mb-1.5">{title}</h1>
       <p className="text-gray-500 text-sm mb-7 leading-relaxed">{subtitle}</p>
       {children}

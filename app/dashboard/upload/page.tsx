@@ -7,15 +7,72 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import {
   CATEGORY_MAP,
   TEMPLATES,
-  getTemplateForCategory,
   type TemplateSectionConfig,
 } from "@/lib/templates";
 import { validateFiles, hasContactInFilename } from "@/lib/imageProcessing";
 import type { ContentBlock, TemplateType } from "@/lib/types";
 
+// ─── Template type options ────────────────────────────────────────────────────
+
+const TYPE_OPTIONS: {
+  type: import("@/lib/types").TemplateType;
+  label: string;
+  description: string;
+  bestFor: string;
+  icon: React.ReactNode;
+}[] = [
+  {
+    type: "image_portfolio",
+    label: "Image Portfolio",
+    description: "Let your visuals do the talking — upload a gallery of your best shots.",
+    bestFor: "design work, branding, photography, creative outputs",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="M21 15l-5-5L5 21"/>
+      </svg>
+    ),
+  },
+  {
+    type: "case_study",
+    label: "Case Study",
+    description: "Walk clients through the brief, your approach, and what you delivered.",
+    bestFor: "marketing, dev projects, coaching, consulting",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+      </svg>
+    ),
+  },
+  {
+    type: "video_showcase",
+    label: "Video Showcase",
+    description: "Lead with a video or audio clip — paste a link or upload the file.",
+    bestFor: "video editing, music production, motion graphics",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14"/>
+        <rect x="2" y="6" width="13" height="12" rx="2"/>
+      </svg>
+    ),
+  },
+  {
+    type: "before_after",
+    label: "Before & After",
+    description: "Show the transformation — original on the left, your result on the right.",
+    bestFor: "redesigns, brand overhauls, makeovers, renovations",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M8 3H5a2 2 0 00-2 2v14a2 2 0 002 2h3M16 3h3a2 2 0 012 2v14a2 2 0 01-2 2h-3M12 3v18"/>
+      </svg>
+    ),
+  },
+];
+
 // ─── Local types ──────────────────────────────────────────────────────────────
 
-type UploadStep = "cover" | "details" | "review";
+type UploadStep = "type" | "cover" | "details" | "review";
 
 interface FilePreview {
   file: File;
@@ -33,7 +90,7 @@ interface SectionData {
 export default function UploadPage() {
   const router = useRouter();
 
-  const [step,         setStep]         = useState<UploadStep>("cover");
+  const [step,         setStep]         = useState<UploadStep>("type");
   const [title,        setTitle]        = useState("");
   const [category,     setCategory]     = useState("");
   const [coverFile,    setCoverFile]    = useState<FilePreview | null>(null);
@@ -49,8 +106,6 @@ export default function UploadPage() {
 
   function pickCategory(cat: string) {
     setCategory(cat);
-    setTemplateType(getTemplateForCategory(cat).type);
-    setSections({});
     setError("");
   }
 
@@ -238,16 +293,20 @@ export default function UploadPage() {
 
   // ─── Progress ──────────────────────────────────────────────────────────────
 
-  const stepIndex = step === "cover" ? 0 : step === "details" ? 1 : 2;
-  const stepLabels = ["Cover", template.label, "Review"];
+  const stepIndex  = step === "type" ? 0 : step === "cover" ? 1 : step === "details" ? 2 : 3;
+  const stepLabels = ["Type", "Cover", "Details", "Review"];
 
   function goBack() {
-    if (step === "cover")   { router.back(); return; }
-    if (step === "details") { setStep("cover"); return; }
+    if (step === "type")    { router.back();       return; }
+    if (step === "cover")   { setStep("type");     return; }
+    if (step === "details") { setStep("cover");    return; }
     setStep("details");
   }
 
   function goNext() {
+    if (step === "type") {
+      setError(""); setStep("cover"); return;
+    }
     if (step === "cover"   && validateCover())   { setStep("details"); return; }
     if (step === "details" && validateDetails())  { setStep("review");  return; }
     if (step === "review")                        { handleSubmit();     return; }
@@ -293,6 +352,49 @@ export default function UploadPage() {
 
       {/* ── Content ───────────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 pb-28">
+
+        {/* ── Step 0: Type selection ──────────────────────────────────────── */}
+        {step === "type" && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="font-display font-bold text-gray-900 text-xl mb-0.5">What kind of project is this?</h1>
+              <p className="text-sm text-gray-500">Pick the format that best shows off this piece of work.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {TYPE_OPTIONS.map((opt) => {
+                const active = templateType === opt.type;
+                return (
+                  <button key={opt.type} type="button"
+                    onClick={() => { setTemplateType(opt.type); setSections({}); }}
+                    className={`relative text-left rounded-2xl p-5 border-2 transition-all group ${
+                      active
+                        ? "border-[#00EFFE] bg-[#00EFFE]/5"
+                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+                    }`}>
+                    {active && (
+                      <span className="absolute top-3 right-3 w-5 h-5 bg-[#00EFFE] rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-[#0A0A0A]" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </span>
+                    )}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-colors ${
+                      active ? "bg-[#00EFFE]/15 text-[#0C5BEE]" : "bg-gray-100 text-gray-500 group-hover:bg-gray-200"
+                    }`}>
+                      {opt.icon}
+                    </div>
+                    <p className={`font-display font-bold text-sm mb-1 ${active ? "text-[#0C5BEE]" : "text-gray-900"}`}>{opt.label}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed mb-3">{opt.description}</p>
+                    <p className={`text-[11px] font-medium ${active ? "text-[#0C5BEE]/70" : "text-gray-400"}`}>
+                      Best for: {opt.bestFor}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ── Step 1: Cover ───────────────────────────────────────────────── */}
         {step === "cover" && (
@@ -367,12 +469,11 @@ export default function UploadPage() {
               </div>
 
               {category && (
-                <div className="mt-3 flex items-center gap-3 bg-[#00EFFE]/8 border border-[#00EFFE]/30 rounded-xl px-4 py-3">
-                  <span className="text-xl">{getTemplateForCategory(category).icon}</span>
-                  <div>
-                    <p className="text-xs font-semibold text-[#0C5BEE]">{getTemplateForCategory(category).label} format</p>
-                    <p className="text-xs text-[#0C5BEE]/70 mt-0.5">{getTemplateForCategory(category).description}</p>
-                  </div>
+                <div className="mt-3 flex items-center gap-2 bg-[#00EFFE]/8 border border-[#00EFFE]/30 rounded-xl px-4 py-2.5">
+                  <svg className="w-3.5 h-3.5 text-[#00EFFE] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-xs text-[#0C5BEE] font-medium">{category}</p>
                 </div>
               )}
             </Section>
@@ -513,7 +614,7 @@ export default function UploadPage() {
           >
             {loading ? (
               <><span className="w-4 h-4 border-2 border-[#0A0A0A]/20 border-t-[#0A0A0A] rounded-full animate-spin" /><span>Submitting…</span></>
-            ) : step === "review" ? "Submit for review →" : "Continue →"}
+            ) : step === "review" ? "Submit for review →" : step === "type" ? "Use this format →" : "Continue →"}
           </button>
         </div>
       </div>

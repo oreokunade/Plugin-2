@@ -42,7 +42,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-white flex flex-col flex-shrink-0 shadow-[2px_0_12px_rgba(0,0,0,0.06)]">
+    <aside className="w-64 min-h-screen bg-white flex flex-col flex-shrink-0 border-r border-gray-100">
 
       {/* Logo */}
       <div className="px-6 h-[72px] flex items-center gap-3 border-b border-gray-100">
@@ -66,10 +66,10 @@ export function AdminSidebar() {
             <Link key={item.href} href={item.href}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition-all group
                 ${isActive
-                  ? "bg-[#0C5BEE] text-white shadow-[0_4px_12px_rgba(12,91,238,0.30)]"
+                  ? "bg-[#00EFFE] text-[#0A0A0A] shadow-[0_4px_12px_rgba(0,239,254,0.35)]"
                   : "text-gray-500 font-medium hover:text-gray-800 hover:bg-gray-50"
                 }`}>
-              <span className={`flex-shrink-0 transition-colors ${isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600"}`}>
+              <span className={`flex-shrink-0 transition-colors ${isActive ? "text-[#0A0A0A]" : "text-gray-400 group-hover:text-gray-600"}`}>
                 {item.icon}
               </span>
               <span className="flex-1 tracking-tight">{item.label}</span>

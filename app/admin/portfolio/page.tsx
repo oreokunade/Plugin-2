@@ -31,7 +31,7 @@ export default async function PortfolioPage() {
         {items.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
@@ -98,7 +98,7 @@ function EmptyState() {
       <p className="text-gray-500 text-sm mb-6">Add anonymized work samples from providers.</p>
       <Link
         href="/admin/portfolio/new"
-        className="bg-cyan hover:bg-cyan-dark text-near-black text-sm font-semibold px-5 py-2.5 rounded-[10px] transition-colors"
+        className="bg-cyan hover:bg-cyan-dark text-near-black text-sm font-semibold px-5 py-3.5 rounded-[10px] transition-colors"
       >
         Add Portfolio Item
       </Link>

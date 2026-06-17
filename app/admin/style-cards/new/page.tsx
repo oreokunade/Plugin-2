@@ -127,7 +127,7 @@ export default function NewStyleCardPage() {
                 className={inputCls}
               />
               <button type="button" onClick={addItemId}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap">
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3.5 rounded-xl text-sm font-medium whitespace-nowrap">
                 Add
               </button>
             </div>
@@ -145,11 +145,11 @@ export default function NewStyleCardPage() {
 
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving}
-              className="bg-cyan hover:bg-cyan-dark text-near-black font-semibold px-6 py-2.5 rounded-[10px] transition-colors disabled:opacity-60">
+              className="bg-cyan hover:bg-cyan-dark text-near-black font-semibold px-6 py-3.5 rounded-[10px] transition-colors disabled:opacity-60">
               {saving ? "Saving…" : "Create Style Card"}
             </button>
             <button type="button" onClick={() => router.back()}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-2.5 rounded-[10px] transition-colors">
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-3.5 rounded-[10px] transition-colors">
               Cancel
             </button>
           </div>

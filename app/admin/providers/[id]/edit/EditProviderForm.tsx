@@ -166,11 +166,11 @@ export default function EditProviderForm({ provider }: { provider: Provider }) {
       {/* Actions */}
       <div className="flex gap-3 pt-2">
         <button onClick={handleSave} disabled={saving || done}
-          className="bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] font-semibold text-[13.5px] px-6 py-2.5 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
+          className="bg-[#00EFFE] hover:bg-[#00D4E0] text-[#0A0A0A] font-semibold text-[13.5px] px-6 py-3.5 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
           {saving ? <><Spinner /> Saving…</> : done ? "✓ Saved" : "Save Changes"}
         </button>
         <button type="button" onClick={() => router.push("/admin/providers")}
-          className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-[13.5px] px-6 py-2.5 rounded-xl transition-colors">
+          className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-[13.5px] px-6 py-3.5 rounded-xl transition-colors">
           Cancel
         </button>
       </div>

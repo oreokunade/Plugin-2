@@ -116,14 +116,14 @@ export default function NewOutcomePage() {
             <button
               type="submit"
               disabled={saving}
-              className="bg-cyan hover:bg-cyan-dark text-near-black font-semibold px-6 py-2.5 rounded-[10px] transition-colors disabled:opacity-60"
+              className="bg-cyan hover:bg-cyan-dark text-near-black font-semibold px-6 py-3.5 rounded-[10px] transition-colors disabled:opacity-60"
             >
               {saving ? "Saving…" : "Create Outcome Card"}
             </button>
             <button
               type="button"
               onClick={() => router.back()}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-2.5 rounded-[10px] transition-colors"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-3.5 rounded-[10px] transition-colors"
             >
               Cancel
             </button>

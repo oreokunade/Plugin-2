@@ -43,7 +43,7 @@ export default async function OutcomesPage() {
 
 function OutcomeCardItem({ card }: { card: OutcomeCard }) {
   return (
-    <div className="bg-white rounded-2xl shadow-[var(--card-shadow)] p-5 hover:shadow-[var(--card-shadow-lg)] transition-shadow">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-gray-200 transition-shadow">
       <div className="flex items-start justify-between gap-3 mb-3">
         <span className="text-xs font-semibold bg-cyan/15 text-dark-teal px-2.5 py-1 rounded-full">
           {card.category}
@@ -78,7 +78,7 @@ function EmptyState() {
       <p className="text-gray-500 text-sm mb-6">Create your first outcome card to get started.</p>
       <Link
         href="/admin/outcomes/new"
-        className="bg-cyan hover:bg-cyan-dark text-near-black text-sm font-semibold px-5 py-2.5 rounded-[10px] transition-colors"
+        className="bg-cyan hover:bg-cyan-dark text-near-black text-sm font-semibold px-5 py-3.5 rounded-[10px] transition-colors"
       >
         Create Outcome Card
       </Link>
