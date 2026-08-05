@@ -277,7 +277,7 @@ function UploadPageContent() {
 
       if (s.inputType === "images" && d.files?.length) {
         const urls = d.files.map((f) => f.previewUrl);
-        const captions = d.files.map((f) => f.caption);
+        const captions = d.files.map((f) => f.caption || "");
         blocks.push({ type: "images", urls, captions, layout: d.layout ?? defaultImageLayout, spacing: defaultImageSpacing });
       }
 
