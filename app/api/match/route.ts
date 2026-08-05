@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb, ADMIN_DEV_MODE } from "@/lib/firebase-admin";
 import { rankItems, rankProviders } from "@/lib/ranking";
 import type { PortfolioItem, MatchRequest, Provider } from "@/lib/types";
+import { MOCK_IMG } from "@/lib/mockImages";
 
 // ─── Dev mode mock ────────────────────────────────────────────────────────────
 
@@ -9,11 +10,11 @@ const DEV_ITEMS: PortfolioItem[] = [
   {
     id: "dev-item-001", provider_id: "dev-uid-001",
     title: "Fintech rebrand — full brand identity",
-    cover_image: "/mock/cover-fintech.svg", template_type: "before_after",
+    cover_image: MOCK_IMG.branding.cover, template_type: "case_study",
     blocks: [
       { type: "text", label: "The Brief",  content: "Series A fintech startup needed a complete brand overhaul." },
       { type: "text", label: "The Result", content: "Full brand identity: logo, colours, and brand guidelines PDF." },
-      { type: "before_after", before: ["/mock/before-1.svg", "/mock/before-2.svg"], after: ["/mock/after-1.svg", "/mock/after-2.svg"] },
+      { type: "images", urls: [...MOCK_IMG.branding.samples] },
     ],
     category: "Branding, Design & Identity",
     tags: ["rebrand", "fintech", "logo", "brand identity"],
@@ -23,8 +24,8 @@ const DEV_ITEMS: PortfolioItem[] = [
   {
     id: "dev-item-002", provider_id: "dev-uid-002",
     title: "Social media kit — fashion brand",
-    cover_image: "/mock/cover-fashion.svg", template_type: "image_portfolio",
-    blocks: [{ type: "images", urls: ["/mock/social-1.svg", "/mock/social-2.svg", "/mock/social-3.svg", "/mock/social-4.svg"] }],
+    cover_image: MOCK_IMG.fashion.cover, template_type: "image_portfolio",
+    blocks: [{ type: "images", urls: [...MOCK_IMG.fashion.posts] }],
     category: "Digital Marketing & E-Commerce",
     tags: ["fashion", "instagram", "content", "social media"],
     status: "approved", quality_tier: "Silver", ocr_flagged: false,
@@ -33,10 +34,10 @@ const DEV_ITEMS: PortfolioItem[] = [
   {
     id: "dev-item-003", provider_id: "dev-uid-003",
     title: "E-commerce product video — 30s ad",
-    cover_image: "/mock/cover-video.svg", template_type: "video_showcase",
+    cover_image: MOCK_IMG.video.cover, template_type: "video_showcase",
     blocks: [
       { type: "video",  url: "https://youtu.be/dQw4w9WgXcQ" },
-      { type: "images", urls: ["/mock/video-still-1.svg", "/mock/video-still-2.svg"] },
+      { type: "images", urls: MOCK_IMG.video.stills.slice(0, 2) },
     ],
     category: "Video, Film & Entertainment",
     tags: ["product", "ecommerce", "ad", "video"],

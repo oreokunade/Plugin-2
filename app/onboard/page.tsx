@@ -167,7 +167,18 @@ export default function OnboardPage() {
       setError("Please select at least one specialisation."); return;
     }
     setError("");
-    if (DEV_MODE) { setStep("ready"); return; }
+    if (DEV_MODE) { 
+      try {
+        localStorage.setItem("dev_profile_draft", JSON.stringify({
+          firstName: profile.firstName.trim(),
+          lastName: profile.lastName.trim(),
+          category: profile.category,
+          bio: profile.bio.trim()
+        }));
+      } catch (e) {}
+      setStep("ready"); 
+      return; 
+    }
     setLoading(true);
     try {
       const user     = auth.currentUser!;
@@ -259,13 +270,13 @@ export default function OnboardPage() {
           {step === "profile" && (
             <div>
               <StepBar current={3} total={3} />
-              <h1 className="font-display font-bold text-gray-900 text-2xl mb-1.5">Set up your profile</h1>
-              <p className="text-gray-500 text-sm mb-8 leading-relaxed">Clients see this next to your work. Your name, category, and what you specialise in.</p>
+              <h1 className="font-display font-bold text-gray-900 text-3xl tracking-tight mb-2">Set up your profile</h1>
+              <p className="text-gray-500 text-[15px] mb-10 leading-relaxed max-w-sm">Clients see this next to your work. Your name, category, and what you specialise in.</p>
 
-              <form onSubmit={handleProfileSubmit} className="space-y-7">
+              <form onSubmit={handleProfileSubmit} className="space-y-6">
 
                 {/* ── Name ── */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] space-y-4">
+                <div className="bg-white border border-gray-200/60 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Your name</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
@@ -285,7 +296,7 @@ export default function OnboardPage() {
                 </div>
 
                 {/* ── Primary service ── */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+                <div className="bg-white border border-gray-200/60 rounded-3xl p-6 sm:p-8 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Primary service <span className="text-[#00EFFE]">*</span></p>
                     {profile.category && (
@@ -331,7 +342,7 @@ export default function OnboardPage() {
 
                 {/* ── Specialisations (shown after category pick) ── */}
                 {profile.category && (
-                  <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+                  <div className="bg-white border border-gray-200/60 rounded-3xl p-6 sm:p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-1.5">
                       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Specialisations <span className="text-[#00EFFE]">*</span>
@@ -374,7 +385,7 @@ export default function OnboardPage() {
 
                 {/* ── Bio ── */}
                 {profile.category && (
-                  <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+                  <div className="bg-white border border-gray-200/60 rounded-3xl p-6 sm:p-8 shadow-sm">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
                       Short bio <span className="normal-case font-normal text-gray-400">(optional)</span>
                     </p>
@@ -382,7 +393,7 @@ export default function OnboardPage() {
                       placeholder="e.g. 5 years building brands for Nigerian startups. I specialise in logo design and visual identity systems."
                       value={profile.bio}
                       onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 focus:border-[#00EFFE] transition-all resize-none" />
+                      className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all resize-none" />
                   </div>
                 )}
 
@@ -439,39 +450,47 @@ const STEP_META = [
 
 function StepBar({ current, total }: { current: number; total: number }) {
   return (
-    <div className="flex items-start mb-8">
+    <div className="flex items-center justify-between w-full mb-16 relative">
       {STEP_META.slice(0, total).map((s, i) => {
         const num    = i + 1;
         const done   = num < current;
         const active = num === current;
         return (
-          <div key={num} className="flex items-start flex-1">
-            <div className="flex flex-col items-center gap-2 min-w-0">
-              <div
-                style={done ? { backgroundColor: "#00EFFE", color: "#0D5C6F" } : undefined}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 text-sm font-bold ${
-                  done    ? ""
-                  : active ? "bg-[#00EFFE]/15 text-[#0C5BEE] ring-2 ring-[#00EFFE]/50"
-                  : "bg-gray-100 text-gray-400"
-                }`}
-              >
-                {done ? (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <path d="M5 13l4 4L19 7"/>
-                  </svg>
-                ) : num}
-              </div>
-              <span className={`text-[11px] font-semibold text-center leading-tight transition-colors max-w-[72px] ${
-                active ? "text-[#0C5BEE]" : done ? "text-[#00BFCC]" : "text-gray-400"
+          <div key={num} className="relative flex flex-col items-center flex-1">
+            {/* Connecting Line (background) */}
+            {i < total - 1 && (
+              <div className="absolute top-[18px] left-[50%] w-full h-[2px] bg-gray-200 -z-10" />
+            )}
+            {/* Connecting Line (active/done) */}
+            {i < total - 1 && done && (
+              <div className="absolute top-[18px] left-[50%] w-full h-[2px] bg-[#00EFFE] -z-10 transition-all duration-500" />
+            )}
+
+            {/* Circle */}
+            <div
+              className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 text-sm font-semibold ${
+                done    ? "bg-[#00EFFE] text-[#0D5C6F] shadow-sm"
+                : active ? "bg-gray-900 text-white shadow-md ring-4 ring-gray-900/10"
+                : "bg-white text-gray-400 ring-1 ring-gray-200"
+              }`}
+            >
+              {done ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <path d="M5 13l4 4L19 7"/>
+                </svg>
+              ) : (
+                num
+              )}
+            </div>
+
+            {/* Label */}
+            <div className="absolute top-12 w-28 text-center flex justify-center">
+              <span className={`text-xs font-medium leading-tight transition-colors ${
+                active ? "text-gray-900" : done ? "text-gray-600" : "text-gray-400"
               }`}>
                 {s.label}
               </span>
             </div>
-            {i < total - 1 && (
-              <div className={`flex-1 h-px mt-[18px] mx-2 transition-colors duration-300 ${
-                num < current ? "bg-[#00EFFE]" : "bg-gray-200"
-              }`} />
-            )}
           </div>
         );
       })}
@@ -485,8 +504,8 @@ function StepCard({ step, total, title, subtitle, children }: {
   return (
     <div>
       <StepBar current={step} total={total} />
-      <h1 className="font-display font-bold text-gray-900 text-2xl mb-1.5">{title}</h1>
-      <p className="text-gray-500 text-sm mb-7 leading-relaxed">{subtitle}</p>
+      <h1 className="font-display font-bold text-gray-900 text-3xl tracking-tight mb-2">{title}</h1>
+      <p className="text-gray-500 text-[15px] mb-8 leading-relaxed max-w-sm">{subtitle}</p>
       {children}
     </div>
   );
@@ -503,16 +522,16 @@ function Label({ children, required }: { children: React.ReactNode; required?: b
 function Input({ className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...props}
-      className={`w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 focus:border-[#00EFFE] transition-all ${className}`} />
+      className={`w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all ${className}`} />
   );
 }
 
 function PrimaryBtn({ loading, label }: { loading: boolean; label: string }) {
   return (
     <button type="submit" disabled={loading}
-      className="w-full py-3.5 bg-[#00EFFE] hover:bg-[#00D4E0] disabled:opacity-50 text-[#0A0A0A] text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+      className="w-full py-3.5 bg-gray-900 hover:bg-gray-800 active:scale-[0.99] disabled:opacity-50 text-white text-[15px] font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
       {loading
-        ? <><span className="w-4 h-4 border-2 border-[#0A0A0A]/20 border-t-[#0A0A0A] rounded-full animate-spin" /><span>Please wait…</span></>
+        ? <><span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /><span>Please wait…</span></>
         : label}
     </button>
   );

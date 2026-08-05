@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ContentBlock, PortfolioItem, QualityTier } from "@/lib/types";
 import { Logo } from "@/components/ui/Logo";
+import { ImageBlockRenderer } from "@/components/ui/ImageBlockRenderer";
 
 const WA_NUMBER = process.env.NEXT_PUBLIC_PLUGIN_WA_NUMBER ?? "";
 
@@ -75,7 +76,6 @@ function ItemCard({ item, onClick }: { item: PortfolioItem; onClick: () => void 
     image_portfolio: "Portfolio",
     case_study:      "Case Study",
     video_showcase:  "Video",
-    before_after:    "Before & After",
   };
 
   return (
@@ -119,15 +119,28 @@ function ItemCard({ item, onClick }: { item: PortfolioItem; onClick: () => void 
 
 // ─── Block renderers ──────────────────────────────────────────────────────────
 
-function BlockRenderer({ block }: { block: ContentBlock }) {
+export function BlockRenderer({ block }: { block: ContentBlock }) {
   switch (block.type) {
-    case "text":
+    case "text": {
+      const s = block.style ?? {};
       return (
-        <div>
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{block.label}</p>
-          <p className="text-sm text-gray-700 leading-relaxed">{block.content}</p>
+        <div className={`mx-auto ${s.width === 'narrow' ? 'max-w-2xl' : s.width === 'wide' ? 'max-w-4xl' : s.width === 'full' ? 'max-w-none' : ''}`}>
+          {block.label && block.label !== "Story" && (
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{block.label}</p>
+          )}
+          <div className="[&>div]:m-0 [&>p]:m-0 [&>div]:leading-[1.75] [&>p]:leading-[1.75]"
+             style={{ 
+               fontFamily: s.fontFamily ? `'${s.fontFamily}', sans-serif` : 'inherit',
+               fontSize: s.size === 'sm' ? '0.875rem' : s.size === 'lg' ? '1.125rem' : s.size === 'xl' ? '1.25rem' : s.size === '2xl' ? '1.5rem' : s.size === '3xl' ? '1.875rem' : '1rem',
+               fontWeight: s.weight === 'bold' ? 700 : s.weight === 'semibold' ? 600 : s.weight === 'medium' ? 500 : 400,
+               color: s.color ?? '#374151',
+               lineHeight: 1.75,
+             }}
+             dangerouslySetInnerHTML={{ __html: block.content }}
+          />
         </div>
       );
+    }
 
     case "stat":
       return (
@@ -138,21 +151,7 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
       );
 
     case "images":
-      if (!block.urls?.length) return null;
-      return (
-        <div>
-          {block.caption && (
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">{block.caption}</p>
-          )}
-          <div className="grid grid-cols-2 gap-2">
-            {block.urls.map((url, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={i} src={url} alt=""
-                className="w-full aspect-square object-cover rounded-xl bg-gray-100" />
-            ))}
-          </div>
-        </div>
-      );
+      return <ImageBlockRenderer block={block} />;
 
     case "video":
       if (!block.url) return null;
@@ -170,28 +169,6 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
         </div>
       );
 
-    case "before_after":
-      return (
-        <div>
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Before & After</p>
-          <div className="grid grid-cols-2 gap-2">
-            {block.before?.slice(0, 1).map((url, i) => (
-              <div key={i} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="Before" className="w-full aspect-square object-cover rounded-xl bg-gray-100" />
-                <span className="absolute bottom-2 left-2 text-[10px] font-bold bg-black/50 text-white px-1.5 py-0.5 rounded-md">Before</span>
-              </div>
-            ))}
-            {block.after?.slice(0, 1).map((url, i) => (
-              <div key={i} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="After" className="w-full aspect-square object-cover rounded-xl bg-gray-100" />
-                <span className="absolute bottom-2 left-2 text-[10px] font-bold bg-[#00EFFE]/80 text-[#0A0A0A] px-1.5 py-0.5 rounded-md">After</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
   }
 }
 
@@ -262,6 +239,7 @@ export default function PortfolioView({ provider, items }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* ── Sticky header ─────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 h-14 flex items-center justify-between">

@@ -2,6 +2,7 @@ import { adminDb, ADMIN_DEV_MODE } from "@/lib/firebase-admin";
 import type { PortfolioItem, Provider, ContentBlock, TemplateType } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { CATEGORY_MAP, TEMPLATES } from "@/lib/templates";
+import { MOCK_IMG } from "@/lib/mockImages";
 import Link from "next/link";
 import ReviewActions from "./ReviewActions";
 
@@ -12,9 +13,9 @@ const DEV_SUBMISSIONS: Record<string, { item: PortfolioItem; provider: Provider 
     item: {
       id: "dev-sub-001", provider_id: "dev-uid-001",
       title: "Fintech rebrand — full brand identity",
-      cover_image: "https://picsum.photos/seed/fintech1/1200/800", template_type: "before_after",
+      cover_image: MOCK_IMG.branding.cover, template_type: "image_portfolio",
       blocks: [
-        { type: "before_after", before: ["https://picsum.photos/seed/before1a/600/600", "https://picsum.photos/seed/before1b/600/600"], after: ["https://picsum.photos/seed/after1a/600/600", "https://picsum.photos/seed/after1b/600/600"] },
+        { type: "images", urls: [...MOCK_IMG.branding.samples] },
         { type: "text", label: "What changed", content: "Redesigned the entire brand from a cluttered 2019 identity to a clean, modern system with new logo, colour palette, and typography." },
       ],
       category: "Branding, Design & Identity", tags: ["rebrand", "fintech", "logo"],
@@ -35,12 +36,12 @@ const DEV_SUBMISSIONS: Record<string, { item: PortfolioItem; provider: Provider 
     item: {
       id: "dev-sub-002", provider_id: "dev-uid-002",
       title: "Social media kit — fashion brand",
-      cover_image: "https://picsum.photos/seed/fashion2/1200/800", template_type: "case_study",
+      cover_image: MOCK_IMG.fashion.cover, template_type: "case_study",
       blocks: [
         { type: "text", label: "The Brief",    content: "A Lagos fashion label needed a consistent social media presence for their Spring/Summer campaign." },
         { type: "text", label: "The Approach", content: "Developed a 30-piece content calendar, designed templates in Canva Pro, and shot 12 original flat-lay product photos." },
         { type: "text", label: "The Result",   content: "Delivered a full social media kit: 30 designed posts, 5 story templates, and brand content guidelines." },
-        { type: "images", urls: ["https://picsum.photos/seed/soc1/600/600", "https://picsum.photos/seed/soc2/600/600", "https://picsum.photos/seed/soc3/600/600", "https://picsum.photos/seed/soc4/600/600"] },
+        { type: "images", urls: [...MOCK_IMG.fashion.posts] },
         { type: "stat", label: "Outcome", value: "Engagement up 340% in the first month after campaign launch" },
       ],
       category: "Digital Marketing & E-Commerce", tags: ["fashion", "instagram", "content"],
@@ -61,11 +62,11 @@ const DEV_SUBMISSIONS: Record<string, { item: PortfolioItem; provider: Provider 
     item: {
       id: "dev-sub-003", provider_id: "dev-uid-003",
       title: "E-commerce product video — 30s ad",
-      cover_image: "https://picsum.photos/seed/product3/1200/800", template_type: "video_showcase",
+      cover_image: MOCK_IMG.video.cover, template_type: "video_showcase",
       blocks: [
         { type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
         { type: "text", label: "About this project", content: "30-second product ad for a Lagos fashion e-commerce brand launching their Harmattan collection on Instagram and TikTok." },
-        { type: "images", urls: ["https://picsum.photos/seed/still1/600/400", "https://picsum.photos/seed/still2/600/400", "https://picsum.photos/seed/still3/600/400"] },
+        { type: "images", urls: [...MOCK_IMG.video.stills] },
       ],
       category: "Video, Film & Entertainment", tags: ["product", "ecommerce", "ad"],
       status: "pending", quality_tier: "Bronze", ocr_flagged: false,
@@ -223,8 +224,6 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 
 function TemplateContent({ item }: { item: PortfolioItem }) {
   switch (item.template_type as TemplateType) {
-    case "before_after":
-      return <BeforeAfterView item={item} />;
     case "case_study":
       return <CaseStudyView item={item} />;
     case "video_showcase":
@@ -233,60 +232,6 @@ function TemplateContent({ item }: { item: PortfolioItem }) {
     default:
       return <ImagePortfolioView item={item} />;
   }
-}
-
-// ─── Before & After ───────────────────────────────────────────────────────────
-
-function BeforeAfterView({ item }: { item: PortfolioItem }) {
-  const baBlock = item.blocks.find((b): b is Extract<ContentBlock, { type: "before_after" }> => b.type === "before_after");
-  const descBlock = item.blocks.find((b): b is Extract<ContentBlock, { type: "text" }> => b.type === "text");
-
-  return (
-    <div className="space-y-5">
-      <SectionLabel icon="↔" label="Before & After" />
-
-      {baBlock ? (
-        <div className="grid grid-cols-2 gap-3">
-          {/* Before */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-gray-400" />
-              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Before</span>
-            </div>
-            {baBlock.before.map((url, i) => (
-              <a key={i} href={url} target="_blank" rel="noreferrer">
-                <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden hover:opacity-90 transition-opacity">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt={`Before ${i + 1}`} className="w-full h-full object-cover" />
-                </div>
-              </a>
-            ))}
-          </div>
-          {/* After */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#00EFFE]" />
-              <span className="text-[11px] font-bold text-[#00EFFE] uppercase tracking-wider">After</span>
-            </div>
-            {baBlock.after.map((url, i) => (
-              <a key={i} href={url} target="_blank" rel="noreferrer">
-                <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden hover:opacity-90 transition-opacity">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt={`After ${i + 1}`} className="w-full h-full object-cover" />
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <CoverImage url={item.cover_image} />
-      )}
-
-      {descBlock && (
-        <TextBlock label={descBlock.label} content={descBlock.content} />
-      )}
-    </div>
-  );
 }
 
 // ─── Case Study ───────────────────────────────────────────────────────────────

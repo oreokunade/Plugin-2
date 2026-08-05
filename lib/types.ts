@@ -17,15 +17,22 @@ export type SubmissionStatus = "pending" | "approved" | "rejected";
 export type TemplateType =
   | "image_portfolio"   // Photography, Graphic Design, Brand Identity
   | "case_study"        // Copywriting, UI/UX, Software Dev, Social Media
-  | "video_showcase"    // Video Production, Motion Graphics
-  | "before_after";     // Web Design, Brand refresh
+  | "video_showcase";   // Video Production, Motion Graphics
+
+export interface TextStyleOptions {
+  size?: "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
+  weight?: "normal" | "medium" | "semibold" | "bold";
+  color?: string;
+  underline?: boolean;
+  width?: "narrow" | "base" | "wide" | "full";
+  fontFamily?: string;
+}
 
 export type ContentBlock =
-  | { type: "text";         label: string; content: string }
-  | { type: "images";       urls: string[]; caption?: string }
+  | { type: "text";         label: string; content: string; style?: TextStyleOptions }
+  | { type: "images";       urls: string[]; caption?: string; captions?: string[]; layout?: "vertical" | "slideshow"; spacing?: number }
   | { type: "video";        url: string; thumbnail?: string }
-  | { type: "stat";         label: string; value: string }
-  | { type: "before_after"; before: string[]; after: string[] };
+  | { type: "stat";         label: string; value: string };
 
 // ─── Layer 2 — Internal Only ──────────────────────────────────────────────────
 
@@ -58,6 +65,7 @@ export interface PortfolioItem {
   category: string;
   tags: string[];
   status: SubmissionStatus; // only "approved" items reach the bot API
+  raw_sections?: any;       // preserves editor state for editing
   admin_notes?: string;
   quality_tier: QualityTier;
   ocr_flagged?: boolean;    // auto-detected contact info in images

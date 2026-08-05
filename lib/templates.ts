@@ -139,7 +139,7 @@ export const CATEGORY_TEMPLATE: Record<string, TemplateType> = {
   "Website, App & Software Development":        "case_study",
   "Digital Marketing & E-Commerce":             "case_study",
   "Digital & Creative Economy":                 "image_portfolio",
-  "Branding, Design & Identity":                "before_after",
+  "Branding, Design & Identity":                "image_portfolio",
   "Writing, Editing & Publishing":              "case_study",
   "Video, Film & Entertainment":                "video_showcase",
   "Music & Audio Production":                   "video_showcase",
@@ -162,7 +162,7 @@ export interface TemplateSectionConfig {
   key: string;
   label: string;
   hint?: string;
-  inputType: "text" | "textarea" | "images" | "video" | "stat" | "before_after";
+  inputType: "text" | "textarea" | "images" | "video" | "stat" | "story_builder";
   required: boolean;
   maxImages?: number;
   placeholder?: string;
@@ -175,8 +175,8 @@ export const TEMPLATES: Record<TemplateType, TemplateConfig> = {
     description: "Best for visual work — let the images speak.",
     icon: "🖼",
     sections: [
-      { key: "gallery",     label: "Project Images",    hint: "Upload your best shots — up to 8 images",   inputType: "images",   required: true,  maxImages: 8 },
       { key: "description", label: "Brief Description", hint: "What was the goal? What did you deliver?",  inputType: "textarea", required: false, placeholder: "e.g. Brand identity for a Lagos fintech — logo, colour system, and guidelines." },
+      { key: "gallery",     label: "Project Images",    hint: "Upload your best shots — up to 20 images",   inputType: "images",   required: true,  maxImages: 20 },
     ],
   },
 
@@ -186,11 +186,8 @@ export const TEMPLATES: Record<TemplateType, TemplateConfig> = {
     description: "Tell the story — brief, approach, result.",
     icon: "📄",
     sections: [
-      { key: "brief",    label: "The Brief",    hint: "What did the client need?",          inputType: "textarea", required: true,  placeholder: "e.g. A fintech startup needed a complete brand overhaul before their Series A launch." },
-      { key: "approach", label: "The Approach", hint: "How did you solve it?",              inputType: "textarea", required: true,  placeholder: "e.g. We started with a discovery session, then developed 3 visual directions..." },
-      { key: "result",   label: "The Result",   hint: "What did you deliver?",              inputType: "textarea", required: true,  placeholder: "e.g. Full brand identity: logo, typography, colour system, brand guidelines PDF." },
-      { key: "images",   label: "Work Samples", hint: "Screenshots or final deliverables",  inputType: "images",   required: true,  maxImages: 6 },
-      { key: "outcome",  label: "Outcome",      hint: "Any measurable result? (optional)",  inputType: "stat",     required: false, placeholder: "e.g. Client raised ₦120M within 3 months of rebrand" },
+      { key: "summary",  label: "Quick Summary", hint: "What was the core challenge and result?", inputType: "textarea", required: true, placeholder: "e.g. A fintech startup needed a complete brand overhaul to attract Series A investors." },
+      { key: "story",    label: "Case Study Story", hint: "Mix text, images, GIFs, and videos to tell your project's story.", inputType: "story_builder", required: true },
     ],
   },
 
@@ -202,21 +199,10 @@ export const TEMPLATES: Record<TemplateType, TemplateConfig> = {
     sections: [
       { key: "video",       label: "Video",                      hint: "Upload your file or paste a YouTube/Drive link", inputType: "video",    required: true  },
       { key: "description", label: "About this project",         hint: "What was it made for?",                         inputType: "textarea", required: true,  placeholder: "e.g. 60-second product launch ad for a Lagos fashion brand." },
-      { key: "stills",      label: "Behind-the-scenes / Stills", hint: "Optional extra images",                         inputType: "images",   required: false, maxImages: 4 },
+      { key: "stills",      label: "Behind-the-scenes / Stills", hint: "Optional extra images",                         inputType: "images",   required: false, maxImages: 20 },
     ],
   },
 
-  before_after: {
-    type: "before_after",
-    label: "Before & After",
-    description: "Show the transformation — before on the left, after on the right.",
-    icon: "↔️",
-    sections: [
-      { key: "before",      label: "Before",       hint: "Images of the original / starting point", inputType: "images",   required: true, maxImages: 4 },
-      { key: "after",       label: "After",        hint: "Images of your finished work",             inputType: "images",   required: true, maxImages: 4 },
-      { key: "description", label: "What changed", hint: "Briefly explain the transformation",       inputType: "textarea", required: true, placeholder: "e.g. Redesigned the entire site from a cluttered 2019 layout to a clean, conversion-focused experience." },
-    ],
-  },
 };
 
 export function getTemplateForCategory(category: string): TemplateConfig {

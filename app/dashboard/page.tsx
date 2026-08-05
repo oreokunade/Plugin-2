@@ -9,6 +9,7 @@ import { auth, db, DEV_MODE } from "@/lib/firebase";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { setAvailability } from "./actions";
 import type { Provider, PortfolioItem, SubmissionStatus } from "@/lib/types";
+import { MOCK_IMG } from "@/lib/mockImages";
 
 // ─── Dev mock data ────────────────────────────────────────────────────────────
 
@@ -23,19 +24,11 @@ const DEV_PROVIDER: Provider = {
   created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
 };
 
-const DEV_ITEMS: PortfolioItem[] = [
-  { id: "dev-001", provider_id: "dev-uid-001", title: "Fintech rebrand — complete brand identity", cover_image: "https://picsum.photos/seed/fintech1/800/600", template_type: "before_after", blocks: [], category: "Brand Identity", tags: ["rebrand", "fintech"], status: "approved", quality_tier: "Gold", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: "dev-002", provider_id: "dev-uid-001", title: "Social media kit for fashion label", cover_image: "https://picsum.photos/seed/fashion2/800/600", template_type: "image_portfolio", blocks: [], category: "Social Media", tags: ["fashion", "instagram"], status: "pending", quality_tier: "Silver", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: "dev-003", provider_id: "dev-uid-001", title: "Pitch deck — agri-tech startup", cover_image: "https://picsum.photos/seed/pitch4/800/600", template_type: "case_study", blocks: [], category: "Graphic Design", tags: ["pitch-deck"], status: "rejected", quality_tier: "Bronze", admin_notes: "Images are too low resolution — please re-upload at 1080p or higher.", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: "dev-004", provider_id: "dev-uid-001", title: "E-commerce product video — 30s ad", cover_image: "https://picsum.photos/seed/product3/800/600", template_type: "video_showcase", blocks: [], category: "Video Production", tags: ["ecommerce", "video", "ad"], status: "approved", quality_tier: "Gold", created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-];
-
 
 const TEMPLATE_LABELS: Record<string, string> = {
   image_portfolio: "Image Portfolio",
   case_study:      "Case Study",
   video_showcase:  "Video",
-  before_after:    "Before & After",
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -65,7 +58,34 @@ function DashboardInner() {
   }, [toast]);
 
   useEffect(() => {
-    if (DEV_MODE) { setProvider(DEV_PROVIDER); setItems(DEV_ITEMS); setAvailState(DEV_PROVIDER.availability); setLoading(false); return; }
+    if (DEV_MODE) { 
+      let customProvider = { ...DEV_PROVIDER };
+      try {
+        const draft = localStorage.getItem("dev_profile_draft");
+        if (draft) {
+          const parsed = JSON.parse(draft);
+          customProvider = {
+            ...customProvider,
+            first_name: parsed.firstName || customProvider.first_name,
+            last_name: parsed.lastName || customProvider.last_name,
+            name: `${parsed.firstName || customProvider.first_name} ${parsed.lastName || customProvider.last_name}`,
+            category: parsed.category || customProvider.category,
+            bio: parsed.bio || customProvider.bio,
+          };
+        }
+      } catch (e) {}
+      
+      setProvider(customProvider); 
+      try {
+        const stored = localStorage.getItem("dev_portfolio_items");
+        setItems(stored ? JSON.parse(stored) : []);
+      } catch (e) {
+        setItems([]);
+      }
+      setAvailState(customProvider.availability); 
+      setLoading(false); 
+      return; 
+    }
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) { router.replace("/onboard"); return; }
       const [provSnap, itemsSnap] = await Promise.all([
@@ -207,16 +227,28 @@ function DashboardInner() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-2">
-              <StatRow count={live}     label="Live"       color="text-[#0D5C6F]"  bg="bg-[#00EFFE]/10"  border="border-[#00EFFE]/25"  icon={
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              } iconColor="text-[#00EFFE]" />
-              <StatRow count={pending}  label="In Review"  color="text-[#7A5800]"  bg="bg-[#FFCC25]/10"  border="border-[#FFCC25]/30"  icon={
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              } iconColor="text-[#FFCC25]" />
-              <StatRow count={rejected} label="Needs Work" color="text-[#FF4555]"  bg="bg-[#FF4555]/8"   border="border-[#FF4555]/20"  icon={
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-              } iconColor="text-[#FF4555]" />
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-default group">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] group-hover:scale-125 transition-transform" />
+                  <span className="text-sm font-semibold text-gray-700">Live projects</span>
+                </div>
+                <span className="font-display font-bold text-gray-900">{live}</span>
+              </div>
+              <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-default group">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-125 transition-transform" />
+                  <span className="text-sm font-semibold text-gray-700">In review</span>
+                </div>
+                <span className="font-display font-bold text-gray-900">{pending}</span>
+              </div>
+              <div className="px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-default group">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)] group-hover:scale-125 transition-transform" />
+                  <span className="text-sm font-semibold text-gray-700">Needs work</span>
+                </div>
+                <span className="font-display font-bold text-gray-900">{rejected}</span>
+              </div>
             </div>
 
             {/* Tip */}
@@ -273,7 +305,7 @@ function DashboardInner() {
                 <div className="break-inside-avoid mb-5">
                   <Link
                     href="/dashboard/upload"
-                    className="flex flex-col items-center justify-center gap-3 text-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#00EFFE] transition-colors group aspect-[4/3]"
+                    className="flex flex-col items-center justify-center gap-3 text-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#00EFFE] transition-colors group aspect-video"
                   >
                     <div className="w-10 h-10 bg-gray-100 group-hover:bg-[#00EFFE]/10 rounded-xl flex items-center justify-center transition-colors">
                       <svg className="w-5 h-5 text-gray-400 group-hover:text-[#00EFFE] transition-colors" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -297,31 +329,17 @@ function DashboardInner() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function StatRow({ count, label, color, bg, border, icon, iconColor }: {
-  count: number; label: string; color: string; bg: string; border: string;
-  icon: React.ReactNode; iconColor: string;
-}) {
-  return (
-    <div className={`${bg} border ${border} rounded-xl p-3 lg:flex lg:items-center lg:justify-between`}>
-      <div className="flex items-center gap-1.5 mb-1 lg:mb-0">
-        <span className={`flex-shrink-0 ${iconColor}`}>{icon}</span>
-        <span className="text-xs text-gray-600">{label}</span>
-      </div>
-      <span className={`font-display font-bold text-xl lg:text-base ${color} block lg:inline`}>{count}</span>
-    </div>
-  );
-}
-
 function ProjectCard({ item }: { item: PortfolioItem }) {
   return (
     <div className="group">
       {/* Image */}
-      <div className="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[4/3]">
+      <div className="relative overflow-hidden rounded-2xl bg-gray-100 aspect-video">
         {item.cover_image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.cover_image}
             alt={item.title}
+            onError={(e) => { (e.target as HTMLImageElement).src = "/mock/cover-fintech.svg"; }}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
@@ -331,8 +349,12 @@ function ProjectCard({ item }: { item: PortfolioItem }) {
             </svg>
           </div>
         )}
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-all duration-300" />
+        {/* Hover overlay with Edit button */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <Link href={`/dashboard/upload?edit=${item.id}`} className="bg-white/90 backdrop-blur-sm text-gray-900 font-semibold text-sm px-5 py-2.5 rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-white">
+            Edit Project
+          </Link>
+        </div>
 
         {/* Status badge */}
         <div className="absolute top-3 right-3">
@@ -344,9 +366,9 @@ function ProjectCard({ item }: { item: PortfolioItem }) {
           <div className="absolute bottom-0 inset-x-0 bg-[#0A0A0A]/80 backdrop-blur-md px-4 py-3.5">
             <p className="text-[10px] font-bold text-[#FF4555] uppercase tracking-wider mb-1">Feedback</p>
             <p className="text-[11px] text-white/75 leading-relaxed line-clamp-2">{item.admin_notes}</p>
-            <Link href="/dashboard/upload"
+            <Link href={`/dashboard/upload?edit=${item.id}`}
               className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#FF4555] hover:opacity-75 transition-opacity">
-              Re-upload →
+              Edit to fix →
             </Link>
           </div>
         )}
