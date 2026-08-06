@@ -91,7 +91,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 export default function OnboardPage() {
   const router = useRouter();
-  const [step, setStep]                 = useState<Step>(DEV_MODE ? "profile" : "phone");
+  const [step, setStep]                 = useState<Step>("phone");
   const [phone, setPhone]               = useState("");
   const [otp, setOtp]                   = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
@@ -122,6 +122,12 @@ export default function OnboardPage() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
+      if (DEV_MODE) {
+        setConfirmation(null);
+        setStep("otp");
+        setLoading(false);
+        return;
+      }
       setupRecaptcha();
       const formatted = phone.startsWith("+") ? phone : `+${phone}`;
       const result = await signInWithPhoneNumber(auth, formatted, window.recaptchaVerifier);
@@ -140,6 +146,15 @@ export default function OnboardPage() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
+      if (DEV_MODE) {
+        if (otp === "1234") {
+          setStep("profile");
+        } else {
+          setError("Invalid code. Please try again.");
+        }
+        setLoading(false);
+        return;
+      }
       const cred = await confirmation!.confirm(otp);
       const snap = await getDoc(doc(db, "providers", cred.user.uid));
       if (snap.exists() && snap.data().onboarding_complete) { router.replace("/dashboard"); return; }
