@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { auth, db, DEV_MODE } from "@/lib/firebase";
 import {
   RecaptchaVerifier,
@@ -14,7 +14,7 @@ import { Logo } from "@/components/ui/Logo";
 
 const MAX_SUBS = 5;
 
-type Step = "phone" | "otp" | "profile" | "ready";
+type Step = "profile" | "ready";
 
 interface ProfileDraft {
   firstName:     string;
@@ -89,18 +89,16 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function OnboardPage() {
+function OnboardContent() {
   const router = useRouter();
-  const [step, setStep]                 = useState<Step>("phone");
-  const [phone, setPhone]               = useState("");
-  const [otp, setOtp]                   = useState("");
-  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
+  const searchParams = useSearchParams();
+  const phoneFromUrl = searchParams.get("phone") || "";
+  const [step, setStep]                 = useState<Step>("profile");
   const [profile, setProfile]           = useState<ProfileDraft>({
     firstName: "", lastName: "", category: "", subcategories: [], bio: "",
   });
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState("");
-  const recaptchaRef                    = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (DEV_MODE) return;
@@ -112,65 +110,7 @@ export default function OnboardPage() {
     return () => unsub();
   }, [router]);
 
-  function setupRecaptcha() {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-    }
-  }
 
-  async function handleSendOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setError(""); setLoading(true);
-    try {
-      if (DEV_MODE) {
-        setConfirmation(null);
-        setStep("otp");
-        setLoading(false);
-        return;
-      }
-      setupRecaptcha();
-      const formatted = phone.startsWith("+") ? phone : `+${phone}`;
-      const result = await signInWithPhoneNumber(auth, formatted, window.recaptchaVerifier);
-      setConfirmation(result);
-      setStep("otp");
-    } catch (err) {
-      setError("Couldn't send code. Check your number and try again.");
-      console.error(err);
-      window.recaptchaVerifier?.clear?.();
-      // @ts-expect-error reset
-      window.recaptchaVerifier = null;
-    } finally { setLoading(false); }
-  }
-
-  async function handleVerifyOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setError(""); setLoading(true);
-    try {
-      if (DEV_MODE) {
-        if (otp === "1234") {
-          setStep("profile");
-        } else {
-          setError("Invalid code. Please try again.");
-        }
-        setLoading(false);
-        return;
-      }
-      const cred = await confirmation!.confirm(otp);
-      const snap = await getDoc(doc(db, "providers", cred.user.uid));
-      if (snap.exists() && snap.data().onboarding_complete) { router.replace("/dashboard"); return; }
-      if (snap.exists() && snap.data().bot_onboarded) {
-        const d = snap.data();
-        setProfile({
-          firstName: d.first_name ?? "", lastName: d.last_name ?? "",
-          category: d.category ?? "", subcategories: d.subcategories ?? [], bio: d.bio ?? "",
-        });
-        setStep("ready");
-      } else {
-        setStep("profile");
-      }
-    } catch { setError("Invalid code. Please try again."); }
-    finally { setLoading(false); }
-  }
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -196,10 +136,11 @@ export default function OnboardPage() {
     }
     setLoading(true);
     try {
-      const user     = auth.currentUser!;
+      const user     = auth.currentUser;
+      const uid      = user?.uid ?? `wa-${phoneFromUrl.replace(/\D/g, "")}`;
       const fullName = `${profile.firstName.trim()} ${profile.lastName.trim()}`;
-      await setDoc(doc(db, "providers", user.uid), {
-        uid: user.uid, phone: user.phoneNumber,
+      await setDoc(doc(db, "providers", uid), {
+        uid, phone: phoneFromUrl || user?.phoneNumber || "",
         first_name: profile.firstName.trim(), last_name: profile.lastName.trim(), name: fullName,
         category: profile.category, subcategories: profile.subcategories,
         bio: profile.bio.trim(), skills: profile.subcategories,
@@ -242,49 +183,12 @@ export default function OnboardPage() {
       <main className="flex-1 flex flex-col items-center px-4 py-10 lg:py-14">
         <div className="w-full max-w-lg">
 
-          {/* ── Phone ── */}
-          {step === "phone" && (
-            <StepCard step={1} total={3} title="Enter your WhatsApp number" subtitle="We'll send a one-time code to confirm it's you. No spam, ever.">
-              <form onSubmit={handleSendOtp} className="space-y-4">
-                <div>
-                  <Label>Phone number</Label>
-                  <div className="mt-2">
-                    <Input type="tel" required autoFocus placeholder="+2348012345678"
-                      value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^\d+]/g, ""))} />
-                    <p className="text-xs text-gray-400 mt-1.5">Include your country code, e.g. +234 for Nigeria</p>
-                  </div>
-                </div>
-                {error && <ErrorMsg msg={error} />}
-                <div id="recaptcha-container" ref={recaptchaRef} />
-                <PrimaryBtn loading={loading} label="Send code →" />
-              </form>
-            </StepCard>
-          )}
 
-          {/* ── OTP ── */}
-          {step === "otp" && (
-            <StepCard step={2} total={3} title="Enter the code we sent you" subtitle={`We texted a 6-digit code to ${phone}. It expires in 10 minutes.`}>
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div>
-                  <Label>6-digit code</Label>
-                  <input type="text" required maxLength={6} autoFocus placeholder="• • • • • •"
-                    value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    className="mt-2 w-full px-4 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 text-2xl tracking-[0.6em] text-center font-mono focus:outline-none focus:ring-2 focus:ring-[#00EFFE]/40 focus:border-[#00EFFE] transition-all" />
-                </div>
-                {error && <ErrorMsg msg={error} />}
-                <PrimaryBtn loading={loading} label="Verify →" />
-                <button type="button" onClick={() => { setStep("phone"); setOtp(""); setError(""); }}
-                  className="w-full text-sm text-gray-400 hover:text-gray-600 transition-colors py-1">
-                  ← Wrong number? Change it
-                </button>
-              </form>
-            </StepCard>
-          )}
 
           {/* ── Profile ── */}
           {step === "profile" && (
             <div>
-              <StepBar current={3} total={3} />
+              <StepBar current={1} total={2} />
               <h1 className="font-display font-bold text-gray-900 text-3xl tracking-tight mb-2">Set up your profile</h1>
               <p className="text-gray-500 text-[15px] mb-10 leading-relaxed max-w-sm">Clients see this next to your work. Your name, category, and what you specialise in.</p>
 
@@ -560,5 +464,13 @@ function ErrorMsg({ msg }: { msg: string }) {
       </svg>
       <span className="text-red-600 text-xs leading-relaxed">{msg}</span>
     </div>
+  );
+}
+
+export default function OnboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500 font-medium">Loading...</div>}>
+      <OnboardContent />
+    </Suspense>
   );
 }
