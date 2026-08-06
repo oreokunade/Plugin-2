@@ -1550,7 +1550,7 @@ function SectionInput({ section, data, defaultImageLayout = "vertical", defaultI
                   )}
                   {block.type === "media" && block.file && (
                     <div className="relative w-full rounded-xl overflow-hidden bg-gray-100">
-                      {block.file.file.type.startsWith("video/") ? (
+                      {block.file.file?.type.startsWith("video/") || block.file.previewUrl.match(/\.(mp4|webm|mov)(\?.*)?$/i) ? (
                         <video src={block.file.previewUrl} autoPlay loop muted playsInline className="w-full h-auto" />
                       ) : (
                         /* eslint-disable-next-line @next/next/no-img-element */
