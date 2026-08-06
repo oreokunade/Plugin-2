@@ -418,7 +418,11 @@ function UploadPageContent() {
       // Upload cover image
       let coverUrl = "/mock/cover-fintech.svg";
       if (!DEV_MODE && coverFile) {
-        coverUrl = await uploadFile(coverFile.file, uid);
+        if (coverFile.file) {
+          coverUrl = await uploadFile(coverFile.file, uid);
+        } else {
+          coverUrl = coverFile.previewUrl;
+        }
       }
 
       const fileToBase64 = (f: File) => new Promise<string>((res) => {
