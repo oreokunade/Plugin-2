@@ -1018,6 +1018,14 @@ function TextBuilderBlock({ block, onChange }: { block: StoryBuilderBlock; onCha
     setIsEditing(false);
   };
 
+  // Set initial content once when entering edit mode — avoids cursor reset from dangerouslySetInnerHTML
+  useEffect(() => {
+    if (isEditing && editorRef.current && block.text) {
+      editorRef.current.innerHTML = block.text;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
+
   return (
     <div className="flex flex-col w-full">
       {isEditing ? (
@@ -1212,7 +1220,6 @@ function TextBuilderBlock({ block, onChange }: { block: StoryBuilderBlock; onCha
                 onChange({ ...block, text: editorRef.current.innerHTML });
               }
             }}
-            dangerouslySetInnerHTML={{ __html: block.text ?? "" }}
             className="w-full px-4 py-4 min-h-[140px] focus:outline-none bg-white [&:empty]:before:content-['Start_writing...'] [&:empty]:before:text-gray-300 [&>div]:m-0 [&>p]:m-0 [&>div]:leading-[1.75] [&>p]:leading-[1.75]"
             style={{ ...computed, lineHeight: 1.75 }}
           />
