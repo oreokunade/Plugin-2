@@ -336,10 +336,10 @@ function UploadPageContent() {
 
         if (s.inputType === "images" && d.files?.length) {
           let urls: string[];
-          let captions: (string | undefined)[] = [];
+          let captions: string[] = [];
           if (DEV_MODE) {
             urls = d.files.map((f, i) => f.file ? `/placeholder-${s.key}-${i + 1}.jpg` : f.previewUrl);
-            captions = d.files.map((f) => f.caption);
+            captions = d.files.map((f) => f.caption || "");
           } else {
             const filesToUpload = d.files.filter((f) => f.file).map((f) => f.file as File);
             let uploadedUrls: string[] = [];
@@ -350,7 +350,7 @@ function UploadPageContent() {
             }
             let uploadIdx = 0;
             urls = d.files.map((f) => f.file ? uploadedUrls[uploadIdx++] : f.previewUrl);
-            captions = d.files.map((f) => f.caption);
+            captions = d.files.map((f) => f.caption || "");
           }
           blocks.push({ type: "images", urls, captions, layout: d.layout ?? defaultImageLayout, spacing: defaultImageSpacing });
         }
