@@ -1662,7 +1662,7 @@ function SectionInput({ section, data, defaultImageLayout = "vertical", defaultI
           </div>
           <div className="min-w-0">
             <p className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors truncate">
-              {videoFile ? videoFile.file.name : "Upload video file"}
+              {videoFile ? (videoFile.file?.name ?? "Uploaded video") : "Upload video file"}
             </p>
             <p className="text-xs text-gray-400">MP4, MOV or WebM · max 20 MB</p>
           </div>
